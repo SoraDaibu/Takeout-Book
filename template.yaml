@@ -2,31 +2,33 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
   takeout-book
-  
+
   Sample SAM Template for takeout-book
 
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
   Function:
-    Timeout: 5
+    Timeout: 15 #Lambda's maxmum seconds is 900(15mins)
 
 Resources:
-  HelloWorldFunction:
+  LineBotFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
-      CodeUri: hello-world/
-      Handler: hello-world
+      FunctionName: LineBot
+      CodeUri: linebot/
+      Handler: linebot
       Runtime: go1.x
       Tracing: Active # https://docs.aws.amazon.com/lambda/latest/dg/lambda-x-ray.html
       Events:
         CatchAll:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
           Properties:
-            Path: /hello
-            Method: GET
-      Environment: # More info about Env Vars: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#environment-object
+            Path: /parrot
+            Method: POST
+      Environment:
         Variables:
-          PARAM1: VALUE
+          LINE_CHANNEL_SECRET: ""
+          LINE_CHANNEL_ACCESS_TOKEN: ""
 
 Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
