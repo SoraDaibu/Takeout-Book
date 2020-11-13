@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -10,12 +11,18 @@ import (
 	"os"
 )
 
+// for line channel's request header, body
+type Webhook struct {
+	Destication string           `json:"destination"`
+	Events      []*linebot.Event `json:"events"`
+}
+
 func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 
 	// botにはClient型の変数が入ったメモリの場所(ポインタ)が入ってる
 	// line sdkのNew関数は引数としてチャネルシークレットと
 	// アクセストークンを引数として渡す必要があるから、渡してる
-	_, err := linebot.New(
+	bot, err := linebot.New(
 		os.Getenv("LINE_CHANNEL_SECRET"),
 		os.Getenv("LINE_CHANNEL_ACCESS_TOKEN"),
 	)
@@ -32,9 +39,40 @@ func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 	log.Print(request.Headers)
 	log.Print(request.Body)
 
+	var webhook Webhook
+
+	if err := json.Unmarshal([]byte(request.Body), &webhook); err != nil {
+		log.Print(err)
+		return events.APIGatewayProxyResponse{
+			StatusCode: http.StatusBadRequest,
+			Body:       fmt.Sprintf(`{"message":"%s"}`+"\n", http.StatusText(http.StatusBadRequest)),
+		}, nil
+	}
+
+	// LINE channelから来たメッセージをオウム返しする
+	for _, event := range webhook.Events {
+		// LINE channelからEventTypeMessageのリクエストが来たときの処理
+		// EventTypeMessage以外でも以下に同じ様にcase文書くと良い
+		switch event.Type {
+		case linebot.EventTypeMessage:
+			// m.TextはLINE channelから送られてきたメッセージが入ってる
+			switch m := event.Message.(type) {
+			case *linebot.TextMessage:
+				if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(m.Text)).Do(); err != nil {
+					log.Print(err)
+					return events.APIGatewayProxyResponse{
+						StatusCode: http.StatusInternalServerError,
+						Body:       fmt.Sprintf(`{"message":"%s"}`+"\n", http.StatusText(http.StatusBadRequest)),
+					}, nil
+				}
+			}
+		}
+	}
+
 	return events.APIGatewayProxyResponse{
 		StatusCode: 200,
 	}, nil
+
 }
 
 func main() {
