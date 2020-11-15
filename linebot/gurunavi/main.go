@@ -3,7 +3,6 @@ package gurunavi
 import (
 	"encoding/json"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"net/url"
 	"os"
@@ -15,11 +14,11 @@ const (
 )
 
 type GurunaviResponseBody struct {
-	Attributes    *Attributes `json:"@attributes,omitempty"`
-	TotalHitCount int         `json:"total_hit_count,omitempty"`
-	HitPerPage    int         `json:"hit_per_page,omitempty"`
-	PageOffset    int         `json:"page_offset,omitempty"`
-	Rest          []*Rest     `json:"rest,omitempty"`
+	Attributes    *Attributes `json:"@attributes"`
+	TotalHitCount int         `json:"total_hit_count"`
+	HitPerPage    int         `json:"hit_per_page"`
+	PageOffset    int         `json:"page_offset"`
+	Rest          []*Rest     `json:"rest"`
 	Error         []*Error    `json:"error"`
 }
 
@@ -106,14 +105,15 @@ type Flags struct {
 }
 
 type Error struct {
-	Code    int    `json: "code"`
+	Code    int    `json:"code"`
 	Message string `json:"message"`
 }
 
 func SearchTakeoutRestaurants(w string) (*GurunaviResponseBody, error) {
 
 	v := url.Values{}
-	v.Add("keyid", os.Getenv("GURUNABI_ACCESS_KEY"))
+	v.Add("keyid", os.Getenv("GURUNAVI_ACCESS_KEY"))
+	v.Add("takeout", 1) // 1 should be set when reseaeching only takeout-available restaurants
 	v.Add("freeword", w)
 
 	resp, err := http.Get(APIEndpoint + "?" + v.Encode())
@@ -131,7 +131,6 @@ func SearchTakeoutRestaurants(w string) (*GurunaviResponseBody, error) {
 	var g *GurunaviResponseBody
 
 	if err := json.Unmarshal(body, &g); err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 
