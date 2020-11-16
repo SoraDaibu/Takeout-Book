@@ -78,17 +78,23 @@ func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 						}, nil
 					}
 
-					var t string
+					var sm linebot.SendingMessage
 
 					switch {
 					case g.Error != nil:
-						t = g.Error[0].Message
+						t := g.Error[0].Message
+						sm = linebot.NewTextMessage(t)
 					default:
-						t = TextRestaurants(g)
+						f := FlexTakeout(g)
+						sm = linebot.NewFlexMessage("テイクアウト可能なお店の検索結果", f)
 					}
 
-					if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(t)).Do(); err != nil {
-						log.Fatal(err)
+					if _, err = bot.ReplyMessage(event.ReplyToken, sm).Do(); err != nil {
+						log.Print(err)
+						return events.APIGatewayProxyResponse{
+							StatusCode: http.StatusInternalServerError,
+							Body: fmt.Sprint(`{"message":"%s"}`+"\n", http.StatusText(http.StatusText(http.StatusInternalServerError)),
+						}, err
 					}
 				}
 			}

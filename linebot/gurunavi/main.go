@@ -113,7 +113,7 @@ func SearchTakeoutRestaurants(w string) (*GurunaviResponseBody, error) {
 
 	v := url.Values{}
 	v.Add("keyid", os.Getenv("GURUNAVI_ACCESS_KEY"))
-	v.Add("takeout", 1) // 1 should be set when reseaeching only takeout-available restaurants
+	v.Add("takeout", "1") // 1 should be set when reseaeching only takeout-available restaurants
 	v.Add("freeword", w)
 
 	resp, err := http.Get(APIEndpoint + "?" + v.Encode())
