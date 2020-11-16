@@ -1,5 +1,6 @@
 {
   "go.formatTool": "gofmt",
+  "go.lintTool": "golangci-lint",
   "launch": {
     "configurations": [],
     "compounds": []
