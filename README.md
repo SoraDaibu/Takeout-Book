@@ -1,16 +1,23 @@
-# takeout-book
+# Takeout-book
 
-This is a sample template for takeout-book - Below is a brief explanation of what we have generated for you:
+テイクアウト可能なお店をLINE bot アプリから検索できるLINE app です。
 
-```bash
-.
-├── Makefile                    <-- Make to automate build
-├── README.md                   <-- This instructions file
-├── hello-world                 <-- Source code for a lambda function
-│   ├── main.go                 <-- Lambda function code
-│   └── main_test.go            <-- Unit tests
-└── template.yaml
-```
+## 仕様技術
+
+[client]
+- LINE app
+
+[Backend]
+- Go 
+
+[Infrastructure]
+- AWS
+ - Lambda
+ - API Gateway
+ - S3
+ - CloudFormation
+
+
 
 ## Requirements
 
@@ -138,4 +145,3 @@ Here are a few ideas that you can use to get more acquainted as to how this over
 Next, you can use the following resources to know more about beyond hello world samples and how others structure their Serverless applications:
 
 * [AWS Serverless Application Repository](https://aws.amazon.com/serverless/serverlessrepo/)
-# Takeout-Book
